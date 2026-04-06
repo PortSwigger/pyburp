@@ -34,3 +34,8 @@ def race_condition():
 
 race_condition()
 
+
+def finish():
+    pool.shutdown()
+
+

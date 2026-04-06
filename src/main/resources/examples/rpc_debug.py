@@ -6,14 +6,14 @@
 # https://youtu.be/FRCnZ8a7UGI
 
 
-client = rpc("localhost", 30051)
+server = rpc("localhost", 30051)
 
-result = client.callFunc('test')
+result = server.callFunc('test')
 
 print(result, type(result))
 print(bytearray(result))
 
 
 def finish():
-    client.shutdown()
+    server.shutdown()
 

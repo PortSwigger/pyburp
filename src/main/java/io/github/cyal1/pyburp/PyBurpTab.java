@@ -216,13 +216,8 @@ public class PyBurpTab extends JPanel {
                     logTextArea.append("Calling the finish function...\n");
                     py_functions.get("finish").__call__();
                 }catch (Exception e){
-                    logTextArea.append("calling finish() error: " + e + "\n");
+                    logTextArea.append("finish(): " + e + "\n");
                 }
-            }
-            try {
-                pyInterp.exec("__pool_shutdown__()");
-            }catch (Exception e){
-                logTextArea.append("calling __pool_shutdown__() error: " + e + "\n");
             }
             myContextMenu.MENUS.clear();
             ALLOWED_URL_PREFIX.clear();

@@ -10,6 +10,10 @@ def fetch_url_task(url):
     print(requestResponse.request().url(), requestResponse.response().statusCode())
 
 
+def finish():
+    pool.shutdown()
+
+
 for url in open('/tmp/urls.txt'):
     fetch_url_task(url)
 

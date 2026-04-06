@@ -43,21 +43,15 @@ EXIT_FLAG = False  # This will become True when click the Stop button
 
 # Class for managing a pool of threads to execute function
 class RequestPool:
-    _all_pools = []
-
     def __init__(self, nThreads):
         self.executor = Executors.newFixedThreadPool(nThreads)
-        RequestPool._all_pools.append(self)
 
     def run(self, func, *args, **kwargs):
-        if EXIT_FLAG:
-            return
         self.executor.execute(lambda: func(*args, **kwargs))
 
     def shutdown(self):
-        if not self.executor.isShutdown():
-            self.executor.shutdownNow()
-            print("[*] All RequestPool have been force shutdown")
+        self.executor.shutdownNow()
+        print("RequestPool shutdown")
 
 
 # Decorator to run a function in the thread pool
@@ -65,11 +59,10 @@ def run_in_pool(pool):
     def decorator(func):
         def wrapper(*args, **kwargs):
             return pool.run(func, *args, **kwargs)
+
         return wrapper
+
     return decorator
-
-
-_threads_instances = []
 
 
 # Decorator to run a function in a thread
@@ -77,29 +70,14 @@ def run_in_thread(func):
     def wrapper(*args, **kwargs):
         class JavaRunnable(Runnable):
             def run(self):
-                current_thread = Thread.currentThread()
-                try:
-                    if EXIT_FLAG: return # You can check if EXIT_FLAG is True in custom function to exit the thread.
+                # You can check if EXIT_FLAG is True in custom function to exit the thread.
+                if EXIT_FLAG is False:
                     func(*args, **kwargs)
-                except Exception as e:
-                    print("[Thread Error] " + str(e))
-                finally:
-                    if current_thread in _threads_instances:
-                        _threads_instances.remove(current_thread)
+
         thread = Thread(JavaRunnable())
         thread.start()
-        _threads_instances.append(thread)
+
     return wrapper
-
-
-def __pool_shutdown__():
-    for pool in RequestPool._all_pools:
-        pool.shutdown()
-    if len(_threads_instances) != 0:
-        for t in _threads_instances:
-            if t.isAlive():
-                t.interrupt()
-        print("[*] All running threads have been force interrupted")
 
 
 # Commonly used function wrappers
